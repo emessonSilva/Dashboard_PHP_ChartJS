@@ -109,6 +109,40 @@ try {
     die("ERROR: Could not able to execute $sqlVendas. " . $e->getMessage());
 }
 
+// Feedbacks por Mês
+try {
+    $sqlFeedback = "SELECT
+                        MONTHNAME(F.dataFeedback) AS month,
+                        SUM(CASE WHEN F.tipoAvaliacao = 'bom' THEN 1 ELSE 0 END) AS feedbackBom,
+                        SUM(CASE WHEN F.tipoAvaliacao = 'ótimo' THEN 1 ELSE 0 END) AS feedbackOtimo,
+                        SUM(CASE WHEN F.tipoAvaliacao = 'ruim' THEN 1 ELSE 0 END) AS feedbackRuim
+                    FROM FeedbackAlunos F
+                    GROUP BY month";
+    $resultFeedback = $pdo->query($sqlFeedback);
+
+    if ($resultFeedback->rowCount() > 0) {
+        $monthLabels4 = array();
+        $feedbackBom = array();
+        $feedbackOtimo = array();
+        $feedbackRuim = array();
+
+        while ($row = $resultFeedback->fetch()) {
+            $monthLabels4[] = formatarNomeMes($row["month"]);
+            $feedbackBom[] = $row["feedbackBom"];
+            $feedbackOtimo[] = $row["feedbackOtimo"];
+            $feedbackRuim[] = $row["feedbackRuim"];
+        }
+
+        unset($resultFeedback);
+    } else {
+        echo "No records matching your query were found.";
+    }
+} catch (PDOException $e) {
+    die("ERROR: Could not able to execute $sqlFeedback. " . $e->getMessage());
+}
+
+
+
 // Close connection
 unset($pdo);
 ?>
@@ -124,19 +158,14 @@ unset($pdo);
 <body>
 
 <aside>
-    <img />
-    <p>Nome da empresa logada</p>
-    <p style="font-style: strong; font-size: 1.5rem;">Filtros</p>
+  
+    <p style="font-style: strong; font-size: 34px;">Filtros</p>
+
     <label for="">Data início</label>
     <input type="date" style="height: 30px;">
     <label for="">Data Fim</label>
     <input type="date" style="height: 30px;">
-    <label for="">Aluno</label>
-    <input style="height: 30px;">
-    <label for="">Produto</label>
-    <input style="height: 30px;">
-    <label for="">Serviço</label>
-    <input style="height: 30px;">
+
 </aside>
 
 <main>
@@ -259,6 +288,17 @@ unset($pdo);
                 const config3 = {
                     type: 'pie',
                     data: data3,
+                    options: {
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Produtos Vendidos',
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        }
+                    }
                 };
 
                 // Render block
@@ -269,37 +309,59 @@ unset($pdo);
             </script>
         </div>
 
-
-<!-- 
         <div class="chart4">
             <canvas id="myChart4"></canvas>
             <script>
                 // Setup block
-                const produtoNome4 = <?php echo json_encode($produtoNome); ?>;
+                const monthLabels4 = <?php echo json_encode($monthLabels4); ?>;
+                const feedbackBom = <?php echo json_encode($feedbackBom); ?>;
+                const feedbackOtimo = <?php echo json_encode($feedbackOtimo); ?>;
+                const feedbackRuim = <?php echo json_encode($feedbackRuim); ?>;
 
                 const data4 = {
-                    labels: produtoNome3,
-                    datasets: [{
-                        label: 'Quantity Sold',
-                        data: <?php echo json_encode($data); ?>,
-                        backgroundColor: [
-                            'red',
-                            'blue',
-                            'yellow',
-                            'green',
-                            'purple',
-                            'pink'
-                        ],
-                        borderWidth: 1
-                    }]
+                    labels: monthLabels4,
+                    datasets: [
+                        {
+                            label: 'Bom',
+                            data: feedbackBom,
+                            backgroundColor: 'rgba(0, 128, 0, 0.5)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Ótimo',
+                            data: feedbackOtimo,
+                            backgroundColor: 'rgba(255, 255, 0, 0.5)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Ruim',
+                            data: feedbackRuim,
+                            backgroundColor: 'rgba(255, 0, 0, 0.5)',
+                            borderWidth: 1
+                        }
+                    ]
                 };
 
                 // Config block
                 const config4 = {
-                    type: 'doughnut',
+                    type: 'bar',
                     data: data4,
                     options: {
-                        
+                        scales: {
+                            x: {
+                                beginAtZero: true
+                            },
+                        },
+                        indexAxis: 'y',
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Feedback das aulas',
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        }
                     }
                 };
 
@@ -309,7 +371,9 @@ unset($pdo);
                     config4
                 );
             </script>
-        </div> -->
+        </div>
+
+
         
     </div>
 

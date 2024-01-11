@@ -11,18 +11,11 @@ aside {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 30px;
     color: white;
     background-color: #3f3f3f;
     min-width: 300px;
     box-sizing: border-box;
-}
-
-img {
-    background: black;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
 }
 
 main {
