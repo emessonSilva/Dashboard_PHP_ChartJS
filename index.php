@@ -161,18 +161,17 @@ unset($pdo);
   
     <p style="font-style: strong; font-size: 34px;">Filtros</p>
 
-    <label for="">Data início</label>
-    <input type="date" style="height: 30px;">
-    <label for="">Data Fim</label>
-    <input type="date" style="height: 30px;">
+    <label for="">Mês e Ano</label>
+    <input type="month" style="height: 30px;">
+
 
 </aside>
 
 <main>
     <div class="charts">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <div class="chart1">
             <canvas id="myChart1"></canvas>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
                 // Setup block
                 const monthLabels = <?php echo json_encode($monthLabels); ?>;
@@ -296,7 +295,9 @@ unset($pdo);
                                 font: {
                                     size: 16
                                 }
-                            }
+                            },
+
+                            
                         }
                     }
                 };
